@@ -3,7 +3,6 @@ add_subdirectory(lib)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 add_executable(Google_Tests_run
-        TransferToTableTests.cpp
         ParserTests.cpp
         FileReaderTests.cpp
         FileWriterTests.cpp

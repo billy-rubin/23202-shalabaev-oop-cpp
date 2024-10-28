@@ -1,23 +1,20 @@
 #include "FileWriter.h"
-#include <iomanip>
+#include "iostream"
 
-FileWriter::FileWriter(string filename) : filename(filename), output_file(nullptr) {}
+FileWriter::FileWriter(string filename) : filename(filename) {}
 
 void FileWriter::open() {
-    output_file = new ofstream(filename);
+    output_file.open(filename);
 }
 
-void FileWriter::write(const vector<pair<string, int>>& wordFrequency, int totalWords) {
-    for (const auto& [word, frequency] : wordFrequency) {
-        double percentage = (frequency * 100.0) / totalWords;
-       *FileWriter::output_file << word << "," << frequency << "," << std::fixed << std::setprecision(2) << percentage << "%\n";
+void FileWriter::write(const vector<string>& outputStrings) {
+    if (output_file && output_file.is_open()) {
+        for (string const& line: outputStrings) {
+            output_file << line << "\n";
+        }
     }
 }
 
 void FileWriter::close() {
-    if (output_file) {
-        output_file->close();
-        delete output_file;
-        output_file = nullptr;
-    }
+    output_file.close();
 }

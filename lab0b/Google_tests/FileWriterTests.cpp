@@ -10,21 +10,20 @@ TEST(FileWriterTest, WriteToFile) {
     FileWriter fileWriter(filename);
     fileWriter.open();
 
-    std::vector<std::pair<std::string, int>> sortedWords = {
-            {"hello", 2},
-            {"world", 1}
+    std::vector<std::string> outputStrings = {
+            {"hello,2,66.666667"},
+            {"world,1,33.333333%"}
     };
-    int totalWords = 3;
-    fileWriter.write(sortedWords, totalWords);
+    fileWriter.write(outputStrings);
 
     fileWriter.close();
 
     std::ifstream file(filename);
     std::string line;
     std::getline(file, line);
-    EXPECT_EQ(line, "hello,2,66.67%");
+    EXPECT_EQ(line, "hello,2,66.666667");
     std::getline(file, line);
-    EXPECT_EQ(line, "world,1,33.33%");
+    EXPECT_EQ(line, "world,1,33.333333%");
     file.close();
     remove(filename.c_str());
 }
@@ -35,9 +34,8 @@ TEST(FileWriterTest, WriteEmptyToFile) {
     FileWriter fileWriter(filename);
     fileWriter.open();
 
-    std::vector<std::pair<std::string, int>> sortedWords = {};
-    int totalWords = 0;
-    fileWriter.write(sortedWords, totalWords);
+    vector<std::string> outputStrings = {};
+    fileWriter.write(outputStrings);
 
     fileWriter.close();
 
@@ -55,15 +53,14 @@ TEST(FileWriterTest, WriteLargeToFile) {
     FileWriter fileWriter(filename);
     fileWriter.open();
 
-    std::vector<std::pair<std::string, int>> sortedWords(10000, {"word", 10000});
-    int totalWords = 10000;
-    fileWriter.write(sortedWords, totalWords);
+    vector<std::string> outputStrings = {"word,1000000,100.00%"};
+    fileWriter.write(outputStrings);
     fileWriter.close();
 
     std::ifstream file(filename);
     std::string line;
     std::getline(file, line);
-    EXPECT_EQ(line, "word,10000,100.00%");
+    EXPECT_EQ(line, "word,1000000,100.00%");
     file.close();
     remove(filename.c_str());
 }

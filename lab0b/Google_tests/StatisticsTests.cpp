@@ -53,3 +53,27 @@ TEST(StatisticsTest, IdenticalFrequencies) {
     };
     EXPECT_EQ(sortedWords, expectedSortedWords);
 }
+
+TEST(StatisticsTest, BasicConverter) {
+    Statistics stats;
+    vector<pair<std::string, int>> sortedWords = {
+            {"hello", 2},
+            {"world", 1}
+    };
+    int totalWords = 3;
+    vector<std::string> outputStrings(sortedWords.size());
+    stats.ConvertInfoIntoString(outputStrings, sortedWords, totalWords);
+    EXPECT_EQ(outputStrings[0], "hello,2,66.666667");
+    EXPECT_EQ(outputStrings[1], "world,1,33.333333");
+}
+
+TEST(StatisticsTest, LargeInfo) {
+    Statistics stats;
+    vector<pair<std::string, int>> sortedWords = {
+            {"word", 1000000},
+    };
+    vector<std::string> outputStrings(sortedWords.size());
+    int totalWords = 1000000;
+    stats.ConvertInfoIntoString(outputStrings, sortedWords, totalWords);
+    EXPECT_EQ(outputStrings[0], "word,1000000,100.000000");
+}

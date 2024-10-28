@@ -1,7 +1,6 @@
 set(SOURCES
         FileReader.cpp
         FileWriter.cpp
-        TransferToTable.cpp
         Statistics.cpp
         Parser.cpp
 )
@@ -9,7 +8,6 @@ set(SOURCES
 set(HEADERS
         FileReader.h
         FileWriter.h
-        TransferToTable.h
         Statistics.h
         Parser.h
 )
