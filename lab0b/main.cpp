@@ -19,9 +19,6 @@ int main(int argc, char* argv[]) {
     fileWriter.open();
     vector <string> outputStrings(sortedWords.size());
     stats.ConvertInfoIntoString(outputStrings, sortedWords, stats.getTotalWords());
-    for (size_t i = 0; i < sortedWords.size(); ++i) {
-        std::cout << outputStrings[i] << " " << i << "\n";
-    }
     fileWriter.write(outputStrings);
     fileWriter.close();
     return 0;

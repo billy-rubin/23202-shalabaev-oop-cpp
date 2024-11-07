@@ -20,11 +20,11 @@ private:
     int totalWords;
 public:
     Statistics();
+    vector<pair<string, int>> Calculate(const map<string, int>& wordFrequency);
+    void ConvertInfoIntoString(vector<string>& outputStrings, const vector<pair<string, int>>& sortedWords, int totalWords);
     void addWordsToTable(const list<string>& words);
     const map<string, int>& getWordFrequency();
     int getTotalWords();
-    void ConvertInfoIntoString(vector<string>& outputStrings, const vector<pair<string, int>>& sortedWords, int totalWords);
-    vector<pair<string, int>> Calculate(const map<string, int>& wordFrequency);
 };
 
 #endif // OOP_CPP_STATISTICS_H
