@@ -6,6 +6,7 @@ int main() {
 
     std::cout << bits.to_string() << "\n";
     std::cout << bits.count() << "\n";
+    std::cout << bits.byte_size() << "\n";
 
     BitArray bitsy(bits);
     std::cout << bitsy.to_string() << "\n";
@@ -13,6 +14,8 @@ int main() {
     bits.resize(24, true);
     std::cout << "After resize(24, true):\n";
     std::cout << bits.to_string() << "\n";
+    std::cout << bits.byte_size() << "\n";
+
 
     bits.set(1, true);
     std::cout << bits.to_string() << "\n";
@@ -21,9 +24,11 @@ int main() {
 
     std::cout << bits.to_string() << "\n";
 
-    bits.resize(8, false);
-    std::cout << "After resize(8, false):\n";
+    bits.resize(198, false);
+    std::cout << "After resize(198, false):\n";
     std::cout << bits.to_string() << "\n";
+    std::cout << bits.byte_size() << "\n";
+
 
     std::cout << "Resize Test" << "\n";
     BitArray bits_to_resize(46, ~0ULL);

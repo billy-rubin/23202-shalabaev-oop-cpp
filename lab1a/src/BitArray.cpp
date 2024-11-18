@@ -269,6 +269,10 @@ int BitArray:: size() const{
     return num_of_bits;
 }
 
+int BitArray::byte_size() const {
+    return num_elements;
+}
+
 bool BitArray:: empty() const{
     return !(num_of_bits);
 }

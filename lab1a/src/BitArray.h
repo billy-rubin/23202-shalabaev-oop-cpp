@@ -92,6 +92,9 @@ public:
     bool operator[](int i) const;
 
     int size() const;
+
+    int byte_size() const;
+
     bool empty() const;
 
     //Возвращает строковое представление массива.

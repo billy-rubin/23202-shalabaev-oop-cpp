@@ -45,24 +45,30 @@ TEST(BitArrayTest, ResizeToTopNewByte) {
     BitArray b(64, ~0UL);
     b.resize(128, false);
     EXPECT_EQ(b.size(), 128);
+    EXPECT_EQ(b.byte_size(), 2);
     EXPECT_EQ(b.count(), 32);
 
     b.resize(32);
     EXPECT_EQ(b.size(), 32);
+    EXPECT_EQ(b.byte_size(), 1);
     EXPECT_EQ(b.count(), 32);
 }
 
 TEST(BitArrayTest, ResizeToTop) {
     BitArray b(46, ~0UL);
+    EXPECT_EQ(b.byte_size(), 1);
     b.resize(55, true);
     EXPECT_EQ(b.size(), 55);
+    EXPECT_EQ(b.byte_size(), 1);
     EXPECT_EQ(b.count(), 41);
 }
 
 TEST(BitArrayTest, ResizeToFloorNewByte) {
     BitArray b(150, ~0UL);
+    EXPECT_EQ(b.byte_size(), 3);
     b.resize(111, false);
     EXPECT_EQ(b.size(), 111);
+    EXPECT_EQ(b.byte_size(), 2);
     EXPECT_EQ(b.count(), 32);
 
     b.resize(32);
@@ -72,12 +78,15 @@ TEST(BitArrayTest, ResizeToFloorNewByte) {
 
 TEST(BitArrayTest, ResizeToFloor) {
     BitArray b(64, ~0UL);
+    EXPECT_EQ(b.byte_size(), 1);
     b.resize(2, false);
     EXPECT_EQ(b.size(), 2);
+    EXPECT_EQ(b.byte_size(), 1);
     EXPECT_EQ(b.count(), 2);
 
     b.resize(32);
     EXPECT_EQ(b.size(), 32);
+    EXPECT_EQ(b.byte_size(), 1);
     EXPECT_EQ(b.count(), 2);
 }
 
