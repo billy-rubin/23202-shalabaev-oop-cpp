@@ -7,18 +7,18 @@
 
 class BitArray{
 private:
-    const int BITS_PER_ELEMENT = 64;
-    uint64_t* bit_array;
+    const int BITS_PER_ELEMENT = 32;
+    uint32_t* bit_array;
     const int BITS_IN_BYTE = 8;
     int num_of_bits;
     int num_elements;
 public:
     class BitProxy {
     private:
-        uint64_t &byte;
+        uint32_t &byte;
         size_t bit_pos;
     public:
-        BitProxy(uint64_t& byte, size_t pos);
+        BitProxy(uint32_t& byte, size_t pos);
         BitProxy& operator=(bool value);
         operator bool() const;
     };
