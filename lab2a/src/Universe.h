@@ -22,7 +22,6 @@ public:
     void display(Grid& currentField) const;
     string getName() const;
     Grid& getField();
-    void setField(const Grid& newField);
     vector<std::pair<int, int>> getAliveCells() const;
     Rules getRules() const;
 

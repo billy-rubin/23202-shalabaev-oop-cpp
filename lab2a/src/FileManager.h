@@ -14,13 +14,13 @@
 
 class FileManager{
 private:
-    static void readName(const std::string& line, std::string& name, bool& hasName);
-    static void readRules(const std::string& line, Rules& rule, bool& hasRule);
-    static void readDimensions(const std::string& line, int& width, int& height, bool& hasDimensions);
-    static void readCoords(const std::string& line, const int& width, const int& height, std::vector<std::pair<int, int>>& liveCells, const bool& hasDimensions, bool& hasCoords);
+    void readName(const std::string& line, std::string& name, bool& hasName);
+    void readRules(const std::string& line, Rules& rule, bool& hasRule);
+    void readDimensions(const std::string& line, int& width, int& height, bool& hasDimensions);
+    void readCoords(const std::string& line, const int& width, const int& height, std::vector<std::pair<int, int>>& liveCells, const bool& hasDimensions, bool& hasCoords);
 public:
-    static void saveUniverse(Universe& universe, const std::string& filename);
-    static Universe loadUniverse(const std::string& filename);
+    void storeUniverse(Universe& universe, const std::string& filename);
+    Universe loadUniverse(const std::string& filename);
 };
 
 #endif //TASK_2_FILEMANAGER_H

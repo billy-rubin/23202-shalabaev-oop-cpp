@@ -1,6 +1,6 @@
 #include "HelpCommandExecutor.h"
 
-void HelpCommandExecutor::execute(const std::vector<std::string>& args, Universe& universe, bool& game_state) {
+void HelpCommandExecutor::execute(const std::vector<std::string>& args) {
     std::cout << "Available commands:\n";
     std::cout << "  dump <filename>         - dump universe in file\n";
     std::cout << "  tick <n=1> or t <n=1>  - calculate n iterations and print the result\n";

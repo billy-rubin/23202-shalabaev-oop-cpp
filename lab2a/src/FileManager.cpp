@@ -61,7 +61,7 @@ void FileManager::readCoords(const string& line, const int& width, const int& he
     hasCoords = true;
 }
 
-void FileManager::saveUniverse(Universe& universe, const string& filename) {
+void FileManager::storeUniverse(Universe& universe, const string& filename) {
     ofstream outfile(filename);
     if (!outfile.is_open()) {
         throw runtime_error("The file couldn't be opened for reading: " + filename);
@@ -81,43 +81,47 @@ void FileManager::saveUniverse(Universe& universe, const string& filename) {
     outfile.close();
 }
 
-Universe FileManager::loadUniverse(const string& filename) {
+Universe FileManager::loadUniverse(const string& filename) {\
+
     ifstream infile(filename);
     if (!infile.is_open()) {
         throw runtime_error("The file couldn't be opened for reading: " + filename);
     }
 
-    string line;
-    string name;
-    Rules rule;
-
-    int width = 50;
-    int height = 20;
+    int width = 40;
+    int height = 40;
     bool hasName = false;
     bool hasRule = false;
     bool hasDimensions = false;
     bool hasCoords = false;
     vector<pair<int, int>> liveCells;
 
+    string line;
+    string name;
+    Rules rule;
+    FileManager fileReader;
+
+
     if (!getline(infile, line)) {
         throw runtime_error("File is empty.");
     }
 
     while (getline(infile, line)) {
+
         if (line.empty()) {
             continue;
         }
         if (line.find("#N") == 0) {
-            readName(line, name, hasName);
+            fileReader.readName(line, name, hasName);
         }
         else if (line.find("#R") == 0) {
-            readRules(line, rule, hasRule);
+            fileReader.readRules(line, rule, hasRule);
         }
         else if (line.find("#D") == 0) {
-            readDimensions(line, width, height, hasDimensions);
+            fileReader.readDimensions(line, width, height, hasDimensions);
         }
         else {
-            readCoords(line, width, height, liveCells, hasDimensions, hasCoords);
+            fileReader.readCoords(line, width, height, liveCells, hasDimensions, hasCoords);
         }
     }
 

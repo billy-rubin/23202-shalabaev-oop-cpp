@@ -8,11 +8,18 @@
 #include <algorithm>
 
 CommandHandler::CommandHandler(Universe& universe) : universe(universe), game_state(true) {
-    commandExecutors["dump"] = make_unique<DumpCommandExecutor>();
-    commandExecutors["tick"] = make_unique<TickCommandExecutor>();
-    commandExecutors["t"] = make_unique<TickCommandExecutor>();
-    commandExecutors["exit"] = make_unique<ExitCommandExecutor>();
-    commandExecutors["help"] = make_unique<HelpCommandExecutor>();
+    commandExecutors["dump"] = new DumpCommandExecutor(universe);
+    commandExecutors["tick"] = new TickCommandExecutor(universe);
+    commandExecutors["t"] = new TickCommandExecutor(universe);
+    commandExecutors["exit"] = new ExitCommandExecutor(game_state);
+    commandExecutors["help"] = new HelpCommandExecutor();
+}
+
+CommandHandler::~CommandHandler() {
+    for (auto& pair : commandExecutors) {
+        delete pair.second;
+    }
+    commandExecutors.clear();
 }
 
 void CommandHandler::processCommand(const string& command) {
@@ -28,9 +35,8 @@ void CommandHandler::processCommand(const string& command) {
 
     transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 
-    auto it = commandExecutors.find(cmd);
-    if (it != commandExecutors.end()) {
-        it->second->execute(args, universe, game_state);
+    if (commandExecutors.count(cmd) > 0) {
+        commandExecutors[cmd]->execute(args);
     } else {
         cerr << "Unknown command: " << cmd << "\n";
         cout << "Type 'help' to see the list of available commands.\n";

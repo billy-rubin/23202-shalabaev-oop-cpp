@@ -1,6 +1,8 @@
 #include "TickCommandExecutor.h"
 
-void TickCommandExecutor::execute(const std::vector<std::string>& args, Universe& universe, bool& game_state) {
+TickCommandExecutor::TickCommandExecutor(Universe& u) : universe(u) {}
+
+void TickCommandExecutor::execute(const std::vector<std::string>& args) {
     int n = 1;
     if (!args.empty()) {
         try {

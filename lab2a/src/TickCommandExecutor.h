@@ -5,8 +5,11 @@
 #include <iostream>
 
 class TickCommandExecutor : public CommandExecutor {
+private:
+    Universe& universe;
 public:
-    void execute(const std::vector<std::string>& args, Universe& universe, bool& game_state) override;
+    TickCommandExecutor(Universe& u);
+    void execute(const std::vector<std::string>& args) override;
 };
 
 #endif // TICKCOMMANDEXECUTOR_H

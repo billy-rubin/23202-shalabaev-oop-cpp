@@ -13,10 +13,11 @@ class CommandHandler {
 private:
     Universe& universe;
     bool game_state;
-    map<string, unique_ptr<CommandExecutor>> commandExecutors;
+    map<string, CommandExecutor*> commandExecutors;
 
 public:
     explicit CommandHandler(Universe& universe);
+    ~CommandHandler();
     void processCommand(const std::string& command);
     bool getGameState() const;
 };

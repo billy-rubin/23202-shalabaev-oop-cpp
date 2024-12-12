@@ -42,10 +42,6 @@ Grid& Universe::getField() {
     return field;
 }
 
-void Universe::setField(const Grid& newField) {
-    field = newField;
-}
-
 vector<pair<int, int>> Universe::getAliveCells() const {
     vector<std::pair<int, int>> liveCells;
     for(int row = 0; row < field.getRows(); ++row){

@@ -9,6 +9,7 @@ set(SOURCES
         ExitCommandExecutor.cpp
         HelpCommandExecutor.cpp
         CommandHandler.cpp
+        Parser.cpp
 )
 
 set(HEADERS
@@ -23,6 +24,7 @@ set(HEADERS
         TickCommandExecutor.h
         HelpCommandExecutor.h
         ExitCommandExecutor.h
+        Parser.h
 )
 
 add_library(${CMAKE_PROJECT_NAME}_lib STATIC ${SOURCES} ${HEADERS})

@@ -6,8 +6,11 @@
 #include <iostream>
 
 class DumpCommandExecutor : public CommandExecutor {
+private:
+    Universe& universe;
 public:
-    void execute(const std::vector<std::string>& args, Universe& universe, bool& game_state) override;
+    DumpCommandExecutor(Universe& universe);
+    void execute(const std::vector<std::string>& args) override;
 };
 
 #endif

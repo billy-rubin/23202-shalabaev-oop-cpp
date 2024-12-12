@@ -6,7 +6,7 @@
 
 class HelpCommandExecutor : public CommandExecutor {
 public:
-    void execute(const std::vector<std::string>& args, Universe& universe, bool& game_state) override;
+    void execute(const std::vector<std::string>& args) override;
 };
 
 #endif // HELPCOMMANDEXECUTOR_H
