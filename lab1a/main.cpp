@@ -2,8 +2,17 @@
 #include <iostream>
 
 int main() {
-    BitArray bits(16, 0b10100);
+    BitArray bits(32, 0b1000011);
+    std::cout << bits.to_string() << "\n";
+    std::cout << bits.count() << "\n";
+    std::cout << bits.byte_size() << "\n";
+    std::cout << "shift" << "\n";
+    bits >>= 5;
+    std::cout << bits.to_string() << "\n";
 
+    std::cout << "bipka\n";
+
+    bits <<= 5;
     std::cout << bits.to_string() << "\n";
     std::cout << bits.count() << "\n";
     std::cout << bits.byte_size() << "\n";

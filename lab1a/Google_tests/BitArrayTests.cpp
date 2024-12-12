@@ -10,12 +10,12 @@ TEST(BitArrayTest, DefaultConstructor) {
 
 // Test constructor with specified number of bits and initial value
 TEST(BitArrayTest, ConstructorWithNumBitsAndValue) {
-    BitArray b(64, 0b1111);
-    EXPECT_EQ(b.size(), 64);
+    BitArray b(32, 0b1111);
+    EXPECT_EQ(b.size(), 32);
     EXPECT_EQ(b.count(), 4);
 
-    BitArray b_zero(64, 0);
-    EXPECT_EQ(b_zero.size(), 64);
+    BitArray b_zero(32, 0);
+    EXPECT_EQ(b_zero.size(), 32);
     EXPECT_EQ(b_zero.count(), 0);
 
 // Boundary test for very large bit count
@@ -24,7 +24,7 @@ TEST(BitArrayTest, ConstructorWithNumBitsAndValue) {
 
 // Test copy constructor
 TEST(BitArrayTest, CopyConstructor) {
-    BitArray b1(64, 0b0001);
+    BitArray b1(32, 0b0001);
     BitArray b2(b1);
     EXPECT_EQ(b1.size(), b2.size());
     EXPECT_EQ(b1.count(), b2.count());
@@ -33,8 +33,8 @@ TEST(BitArrayTest, CopyConstructor) {
 
 // Test swap
 TEST(BitArrayTest, Swap) {
-    BitArray b1(64, 0ULL);
-    BitArray b2(64, 1ULL);
+    BitArray b1(32, 0ULL);
+    BitArray b2(32, 1ULL);
     b1.swap(b2);
     EXPECT_EQ(b1.count(), 1);
     EXPECT_EQ(b2.count(), 0);
@@ -42,10 +42,10 @@ TEST(BitArrayTest, Swap) {
 
 // Test resize
 TEST(BitArrayTest, ResizeToTopNewByte) {
-    BitArray b(64, ~0UL);
+    BitArray b(32, ~0UL);
     b.resize(128, false);
     EXPECT_EQ(b.size(), 128);
-    EXPECT_EQ(b.byte_size(), 2);
+    EXPECT_EQ(b.byte_size(), 4);
     EXPECT_EQ(b.count(), 32);
 
     b.resize(32);
@@ -56,19 +56,19 @@ TEST(BitArrayTest, ResizeToTopNewByte) {
 
 TEST(BitArrayTest, ResizeToTop) {
     BitArray b(46, ~0UL);
-    EXPECT_EQ(b.byte_size(), 1);
+    EXPECT_EQ(b.byte_size(), 2);
     b.resize(55, true);
     EXPECT_EQ(b.size(), 55);
-    EXPECT_EQ(b.byte_size(), 1);
+    EXPECT_EQ(b.byte_size(), 2);
     EXPECT_EQ(b.count(), 41);
 }
 
 TEST(BitArrayTest, ResizeToFloorNewByte) {
     BitArray b(150, ~0UL);
-    EXPECT_EQ(b.byte_size(), 3);
+    EXPECT_EQ(b.byte_size(), 5);
     b.resize(111, false);
     EXPECT_EQ(b.size(), 111);
-    EXPECT_EQ(b.byte_size(), 2);
+    EXPECT_EQ(b.byte_size(), 4);
     EXPECT_EQ(b.count(), 32);
 
     b.resize(32);
@@ -78,7 +78,7 @@ TEST(BitArrayTest, ResizeToFloorNewByte) {
 
 TEST(BitArrayTest, ResizeToFloor) {
     BitArray b(64, ~0UL);
-    EXPECT_EQ(b.byte_size(), 1);
+    EXPECT_EQ(b.byte_size(), 2);
     b.resize(2, false);
     EXPECT_EQ(b.size(), 2);
     EXPECT_EQ(b.byte_size(), 1);
@@ -128,42 +128,42 @@ TEST(BitArrayTest, BitwiseOrOperation) {
 
 // Test bitwise XOR operation
 TEST(BitArrayTest, BitwiseXorOperation) {
-    BitArray b1(64, 0b1010);
-    BitArray b2(64, 0b0101);
+    BitArray b1(32, 0b1010);
+    BitArray b2(32, 0b0101);
     b1 ^= b2;
     EXPECT_EQ(b1.count(), 4);
 
-    EXPECT_THROW(b1 ^= BitArray(32, 0), std::invalid_argument);
+    EXPECT_THROW(b1 ^= BitArray(16, 0), std::invalid_argument);
 }
 
 TEST(BitArrayTest, LeftShift) {
-    BitArray b(64, 0b1000011);
+    BitArray b(32, 0b1000011);
+    b >>= 5;
+    EXPECT_EQ(b[1], true);
     b <<= 5;
-
-    EXPECT_EQ(b[0], true);
-    EXPECT_EQ(b[4], true);
+    EXPECT_EQ(b[6], true);
 }
 
 TEST(BitArrayTest, RightShift) {
-    BitArray b(64, 0b1000101);
+    BitArray b(32, 0b1000101);
     b >>= 5;
 
-    EXPECT_EQ(b[63], false);
-    EXPECT_EQ(b[59], false);
+    EXPECT_EQ(b[31], false);
+    EXPECT_EQ(b[27], false);
 }
 
 // Test set and reset methods
 TEST(BitArrayTest, SetAndReset) {
-    BitArray b(64);
+    BitArray b(32);
     b.set(0);
-    b.set(63);
+    b.set(31);
     EXPECT_TRUE(b[0]);
-    EXPECT_TRUE(b[63]);
-    b.reset(63);
-    EXPECT_FALSE(b[63]);
+    EXPECT_TRUE(b[31]);
+    b.reset(31);
+    EXPECT_FALSE(b[31]);
 
-    EXPECT_THROW(b.set(64), std::out_of_range);
-    EXPECT_THROW(b.reset(64), std::out_of_range);
+    EXPECT_THROW(b.set(61), std::out_of_range);
+    EXPECT_THROW(b.reset(61), std::out_of_range);
 }
 
 // Test set all and reset all

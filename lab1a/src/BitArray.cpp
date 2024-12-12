@@ -9,7 +9,7 @@ BitArray::BitArray(int num_bits, unsigned long value) : num_of_bits(num_bits) {
         throw std::invalid_argument("Number of bits can't be negative");
 
     num_elements = (num_of_bits + BITS_PER_ELEMENT - 1) / BITS_PER_ELEMENT;
-    bit_array = new uint64_t[num_elements];
+    bit_array = new uint32_t[num_elements];
 
     for (int i = 0; i < num_elements; ++i)
         bit_array[i] = 0;
@@ -23,7 +23,7 @@ BitArray::BitArray(int num_bits, unsigned long value) : num_of_bits(num_bits) {
 
 BitArray::BitArray(const BitArray& b) : num_of_bits(b.num_of_bits), num_elements(b.num_elements) {
     if (num_elements > 0) {
-        bit_array = new uint64_t[num_elements];
+        bit_array = new uint32_t[num_elements];
         for (int i = 0; i < num_elements; ++i)
             bit_array[i] = b.bit_array[i];
     } else {
@@ -35,32 +35,32 @@ BitArray:: ~BitArray(){
     delete[] bit_array;
 }
 
-BitArray::BitProxy::BitProxy(uint64_t &byte, size_t pos) : byte(byte), bit_pos(pos){}
+BitArray::BitProxy::BitProxy(uint32_t &byte, size_t pos) : byte(byte), bit_pos(pos){}
 
 BitArray::BitProxy& BitArray::BitProxy:: operator=(bool value) {
     if (value)
-        byte |= (1ULL << bit_pos);
+        byte |= (1UL << bit_pos);
     else
-        byte &= ~(1ULL << bit_pos);
+        byte &= ~(1UL << bit_pos);
     return *this;
 }
 
 BitArray:: BitProxy:: operator bool() const {
-    return (byte & (1ULL << bit_pos)) != 0;
+    return (byte & (1UL << bit_pos)) != 0;
 }
 
 BitArray::BitProxy BitArray::operator[](size_t bit) {
     if (bit >= num_of_bits)
         throw std::out_of_range("Index of bit is out of range");
-    size_t index = bit / 64;
-    size_t pos = bit % 64;
+    size_t index = bit / BITS_PER_ELEMENT;
+    size_t pos = bit % BITS_PER_ELEMENT;
     return BitProxy(bit_array[index], pos);
 }
 
 void BitArray:: HideBits() {
     if (num_of_bits % BITS_PER_ELEMENT != 0) {
         int extra_bits = BITS_PER_ELEMENT - (num_of_bits % BITS_PER_ELEMENT);
-        bit_array[num_elements - 1] &= (~0ULL >> extra_bits);
+        bit_array[num_elements - 1] &= (~0UL >> extra_bits);
     }
 }
 
@@ -72,19 +72,19 @@ void BitArray:: swap(BitArray& b){
 
 void BitArray::resize(int num_bits, bool value) {
     int new_num_elements = (num_bits + BITS_PER_ELEMENT - 1) / BITS_PER_ELEMENT;
-    uint64_t* new_array = new uint64_t[new_num_elements];
+    uint32_t* new_array = new uint32_t[new_num_elements];
 
-    uint64_t fill_value = value ? ~0ULL : 0ULL;
+    uint32_t fill_value = value ? ~0UL : 0UL;
     for (int i = 0; i < new_num_elements; ++i)
         new_array[i] = fill_value;
 
     size_t bits_to_copy = (num_bits < num_of_bits) ? num_bits : num_of_bits;
 
     for (int i = 0 ; i < bits_to_copy; i++){
-        if (bit_array[i / BITS_PER_ELEMENT] >> (i % BITS_PER_ELEMENT) & 1ULL){
-            new_array[i / BITS_PER_ELEMENT] |= (1ULL << (i % BITS_PER_ELEMENT));
+        if (bit_array[i / BITS_PER_ELEMENT] >> (i % BITS_PER_ELEMENT) & 1UL){
+            new_array[i / BITS_PER_ELEMENT] |= (1UL << (i % BITS_PER_ELEMENT));
         } else {
-            new_array[i / BITS_PER_ELEMENT] &= ~(1ULL << (i % BITS_PER_ELEMENT));
+            new_array[i / BITS_PER_ELEMENT] &= ~(1UL << (i % BITS_PER_ELEMENT));
         }
     }
 
@@ -96,7 +96,7 @@ void BitArray::resize(int num_bits, bool value) {
 }
 
 bool BitArray:: operator[](int i) const {
-    return (bit_array[i / BITS_PER_ELEMENT] >> (i % BITS_PER_ELEMENT)) & 1ULL;
+    return (bit_array[i / BITS_PER_ELEMENT] >> (i % BITS_PER_ELEMENT)) & 1UL;
 }
 
 string BitArray:: to_string() const {
@@ -150,48 +150,66 @@ BitArray& BitArray::operator^=(const BitArray& b) {
     return *this;
 }
 
-BitArray& BitArray::operator<<=(int n) {
+BitArray& BitArray:: operator<<=(int n) {
     if (n < 0) {
-        throw std::invalid_argument("Number of bits can't be negative");
-    }
-    uint64_t bits_to_shift = n % BITS_PER_ELEMENT;
-    uint64_t elements_to_shift = n / BITS_PER_ELEMENT;
-    uint64_t* new_bit_array = new uint64_t[num_elements];
-
-    for (int i = num_elements - 1; i >= 0; --i) {
-
-        uint64_t prev_elem = (i - elements_to_shift >= 0) ? bit_array[i - elements_to_shift] : 0;
-        uint64_t cur_elem = (i - elements_to_shift - 1 >= 0 && bits_to_shift != 0) ? bit_array[i - elements_to_shift - 1] : 0;
-
-        new_bit_array[i] = (prev_elem << bits_to_shift) | (cur_elem >> (BITS_PER_ELEMENT - bits_to_shift));
+        throw std::invalid_argument("Number of bits to shift cannot be negative");
     }
 
-    delete[] bit_array;
-    bit_array = new_bit_array;
-    HideBits();
-    return (*this);
+    int full_shifts = n / 32;
+    int bit_shifts = n % 32;
+
+    for (int i = num_elements - 1; i >= full_shifts; --i) {
+        bit_array[i] = bit_array[i - full_shifts];
+    }
+
+    for (int i = 0; i < full_shifts; ++i) {
+        bit_array[i] = 0;
+    }
+
+    if (bit_shifts > 0) {
+        for (int i = num_elements - 1; i > 0; --i) {
+            bit_array[i] = (bit_array[i] << bit_shifts) | (bit_array[i - 1] >> (32 - bit_shifts));
+        }
+        bit_array[0] <<= bit_shifts;
+    }
+
+    int extra_bits = num_of_bits % 32;
+    if (extra_bits != 0) {
+        bit_array[num_elements - 1] &= ~(0xFFFFFFFF >> extra_bits);
+    }
+
+    return *this;
 }
 
 BitArray& BitArray::operator>>=(int n) {
     if (n < 0) {
-        throw std::invalid_argument("Number of bits can't be negative");
-    }
-    uint64_t bits_to_shift = n % BITS_PER_ELEMENT;
-    uint64_t elements_to_shift = n / BITS_PER_ELEMENT;
-    uint64_t* new_bit_array = new uint64_t[num_elements];
-
-    for (int i = 0; i < num_elements; i++) {
-
-        uint64_t cur_elem = (i + elements_to_shift < num_elements) ? bit_array[i + elements_to_shift] : 0;
-        uint64_t prev_elem = (i + elements_to_shift + 1 < num_elements && bits_to_shift != 0) ? bit_array[i + elements_to_shift + 1] : 0;
-
-        new_bit_array[i] = (cur_elem >> bits_to_shift) | (prev_elem << (BITS_PER_ELEMENT - bits_to_shift));
+        throw std::invalid_argument("Number of bits to shift cannot be negative");
     }
 
-    delete[] bit_array;
-    bit_array = new_bit_array;
+    int full_shifts = n / 32;
+    int bit_shifts = n % 32;
 
-    return (*this);
+    for (int i = 0; i < num_elements - full_shifts; ++i) {
+        bit_array[i] = bit_array[i + full_shifts];
+    }
+
+    for (int i = num_elements - full_shifts; i < num_elements; ++i) {
+        bit_array[i] = 0;
+    }
+
+    if (bit_shifts > 0) {
+        for (int i = 0; i < num_elements - 1; ++i) {
+            bit_array[i] = (bit_array[i] >> bit_shifts) | (bit_array[i + 1] << (32 - bit_shifts));
+        }
+        bit_array[num_elements - 1] >>= bit_shifts;
+    }
+
+    int extra_bits = num_of_bits % 32;
+    if (extra_bits != 0) {
+        bit_array[num_elements - 1] &= (0xFFFFFFFF >> extra_bits);
+    }
+
+    return *this;
 }
 
 
