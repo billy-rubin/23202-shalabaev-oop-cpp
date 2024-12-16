@@ -47,7 +47,7 @@ vector<pair<int, int>> Universe::getAliveCells() const {
     for(int row = 0; row < field.getRows(); ++row){
         for(int col = 0; col < field.getCols(); ++col){
             if (field.getCell(row, col)){
-                liveCells.emplace_back(col, row);
+                liveCells.emplace_back(row, col);
             }
         }
     }
