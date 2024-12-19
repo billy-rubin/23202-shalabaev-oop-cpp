@@ -18,9 +18,7 @@ public:
     std::vector<int16_t>& getSamples();
     const std::vector<int16_t>& getSamples() const;
 
-    int getSampleRate() const;
-
-protected:
+private:
     char chunkID[4];
     int chunkSize;
     char format[4];
@@ -34,8 +32,6 @@ protected:
     int bitsPerSample;
     char subchunk2ID[4];
     int subchunk2Size;
-
-private:
     std::vector<int16_t> samples;
 };
 

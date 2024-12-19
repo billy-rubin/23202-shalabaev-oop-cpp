@@ -1,7 +1,6 @@
 #ifndef LAB3_CONVERTER_H
 #define LAB3_CONVERTER_H
 #include "WavHeader.h"
-#include "AudioStream.h"
 #include <map>
 #include <memory>
 #include <string>
@@ -11,11 +10,13 @@
 #include <string>
 
 class Converter {
+protected:
+    const int sampleRate = 44100;
 public:
+    Converter() = default;
     virtual ~Converter() {}
-    // Return a newly allocated AudioStream. Caller must delete it.
-    virtual AudioStream* convert(const AudioStream& mainStream,
-                                 const std::map<int, WavFile*>& additionalInputs) const = 0;
+    virtual std::vector<int16_t> convert(const std::vector<int16_t>& mainStream, const std::vector<WavFile*>& additionalInputs) const = 0;
+    virtual std::string getDescription() const = 0;
 };
 
 class MuteConverter : public Converter {
@@ -23,9 +24,12 @@ private:
     int start;
     int end;
 public:
+    MuteConverter() : Converter() {}
     MuteConverter(int startSec, int endSec);
     virtual ~MuteConverter() {}
-    AudioStream* convert(const AudioStream& mainStream, const std::map<int, WavFile*>& additionalInputs) const override;
+    std::vector<int16_t> convert(const std::vector<int16_t>& mainStream, const std::vector<WavFile*>& additionalInputs) const override;
+    std::string getDescription() const override;
+
 };
 
 class MixConverter : public Converter {
@@ -33,9 +37,11 @@ private:
     int fileIndex;
     int insert;
 public:
+    MixConverter() : Converter() {}
     MixConverter(int fileIndex, int insertSec);
     virtual ~MixConverter() {}
-    AudioStream* convert(const AudioStream& mainStream, const std::map<int, WavFile*>& additionalInputs) const override;
+    std::vector<int16_t> convert(const std::vector<int16_t>& mainStream, const std::vector<WavFile*>& additionalInputs) const override;
+    std::string getDescription() const override;
 };
 
 class EchoConverter : public Converter {
@@ -43,9 +49,11 @@ private:
     int delaySec;
     float attenuation;
 public:
+    EchoConverter() : Converter() {}
     EchoConverter(int delaySec, float attenuation);
     virtual ~EchoConverter() {}
-    AudioStream* convert(const AudioStream& mainStream, const std::map<int, WavFile*>& additionalInputs) const override;
+    std::vector<int16_t> convert(const std::vector<int16_t>& mainStream, const std::vector<WavFile*>& additionalInputs) const override;
+    std::string getDescription() const override;
 };
 
 #endif //LAB3_CONVERTER_H

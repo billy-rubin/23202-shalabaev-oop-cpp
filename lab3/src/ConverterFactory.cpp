@@ -1,53 +1,36 @@
 #include "ConverterFactory.h"
-#include "Converter.h"
-#include "ExceptionsHandler.h"
-#include <sstream>
-#include <stdexcept>
-#include <regex>
 
-ConverterFactory::ConverterFactory() {
-    converterTypes["mute"] = new MuteConverter(0, 0);
-    converterTypes["mix"] = new MixConverter(1, 0);
-    converterTypes["echo"] = new EchoConverter(1, 0.5f);
+Converter* MuterFactory::create(const std::smatch& match) const {
+    if (match.size() < 3) {
+        throw ConfigParseException("Invalid parameters for mute converter.");
+    }
+
+    int startSec = std::stoi(match[1].str());
+    int endSec = std::stoi(match[2].str());
+
+    return new MuteConverter(startSec, endSec);
 }
 
-ConverterFactory::~ConverterFactory() {
-    for (auto &kv : converterTypes) {
-        delete kv.second;
+Converter* MixerFactory::create(const std::smatch& match) const {
+    if (match.size() < 2) {
+        throw ConfigParseException("Invalid parameters for mix converter.");
     }
+
+    int fileIndex = std::stoi(match[1].str()) - 1;
+    int insertSec = 0;
+    if (match.size() >= 3 && match[2].matched) {
+        insertSec = std::stoi(match[2].str());
+    }
+
+    return new MixConverter(fileIndex, insertSec);
 }
 
-Converter* ConverterFactory::createFromLine(const std::string& line) const {
-    std::regex muteRegex("^mute\\s+(\\d+)\\s+(\\d+)$");
-    std::regex mixRegex("^mix\\s+\\$(\\d+)(?:\\s+(\\d+))?$");
-    std::regex echoRegex("^echo\\s+(\\d+)\\s+([0-9\\.]+)$");
-
-    std::smatch match;
-
-    // Check for commas and empty lines
-    std::string trimmed = line;
-    while(!trimmed.empty() && (trimmed.back() == ' ' || trimmed.back() == '\t'))
-        trimmed.pop_back();
-    if (trimmed.empty() || trimmed[0] == '#') {
-        return nullptr;
+Converter* EchoerFactory::create(const std::smatch& match) const {
+    if (match.size() < 3) {
+        throw ConfigParseException("Invalid parameters for echo converter.");
     }
 
-    if (std::regex_match(trimmed, match, muteRegex)) {
-        int startSec = std::stoi(match[1].str());
-        int endSec = std::stoi(match[2].str());
-        return new MuteConverter(startSec, endSec);
-    } else if (std::regex_match(trimmed, match, mixRegex)) {
-        int fileIndex = std::stoi(match[1].str());
-        int insertSec = 0;
-        if (match[2].matched) {
-            insertSec = std::stoi(match[2].str());
-        }
-        return new MixConverter(fileIndex, insertSec);
-    } else if (std::regex_match(trimmed, match, echoRegex)) {
-        int delaySec = std::stoi(match[1].str());
-        float attenuation = std::stof(match[2].str());
-        return new EchoConverter(delaySec, attenuation);
-    } else {
-        throw ConfigParseException("Unknown or invalid converter line: " + line);
-    }
+    int startSec = std::stoi(match[1].str());
+    float attenuation = std::stof(match[2].str());
+    return new EchoConverter(startSec, attenuation);
 }

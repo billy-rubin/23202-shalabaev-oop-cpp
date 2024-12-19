@@ -1,5 +1,6 @@
 #include "CmdParser.h"
-
+#include "string"
+#include "regex"
 CmdParser::CmdParser(int argc, char** argv)
         : argc(argc), argv(argv), isHelpNeeded(false) {
 }
@@ -19,60 +20,35 @@ bool CmdParser::parseArguments() {
         std::cerr << "Not enough arguments. Type -h for help." << std::endl;
         return false;
     }
-
-    int i = 1;
-    while (i < argc) {
-        std::string arg = argv[i];
-        if (arg == "-h") {
-            isHelpNeeded = true;
-            i++;
-        } else if (arg == "-c") {
-            i++;
-            if (i >= argc) {
-                std::cerr << "-c requires config file." << std::endl;
-                return false;
-            }
-            configFile = argv[i++];
-            if (i >= argc) {
-                std::cerr << "-c requires output file." << std::endl;
-                return false;
-            }
-            outputFile = argv[i++];
-            if (i >= argc) {
-                std::cerr << "-c requires at least 1 input file." << std::endl;
-                return false;
-            }
-            for (; i < argc; i++) {
-                inputFiles.push_back(argv[i]);
-            }
-            break; // Все оставшиеся аргументы это входные файлы
-        } else {
-            std::cerr << "Unknown argument: " << arg << std::endl;
-            return false;
+    std::regex wav (R"((.*\.wav)$)", std::regex::icase);
+    std::regex txt (R"((.*\.txt)$)", std::regex::icase);
+    std::string arg = argv[1];
+    if (arg == "-h"){
+        printHelp();
+        isHelpNeeded = true;
+        return true;
+    } else if (arg == "-c"){
+        for (int i = 2; i < argc; i++){
+            std::string fileName = argv[i];
+            if (std::regex_match(fileName, txt) && configFile.empty()) {
+                configFile = fileName;
+            } else if (std::regex_match(fileName, wav) && outputFile.empty()){
+                outputFile = fileName;
+            } else if (std::regex_match(fileName, wav))
+                inputFiles.push_back(fileName);
         }
+    } else {
+        std::cerr << "Invalid format of commandline. Type -h for help." << std::endl;
     }
-
-    if (!isHelpNeeded && configFile.empty()) {
-        std::cerr << "Config file isn't specified." << std::endl;
-        return false;
-    }
-
     return true;
 }
 
 void CmdParser::printHelp() {
     std::cout << "Usage:\n"
-              << "sound_processor [-h] [-c config.txt output.wav input1.wav [input2.wav …]]\n\n"
+              << "sound_processor [-h] [-c config.txt output.wav input1.wav [input2.wav ...]]\n\n"
               << "Parameters:\n"
               << "-h : show this help\n"
-              << "-c config.txt output.wav input1.wav [input2.wav ...] : run processing\n\n"
-              << "Supported converters:\n"
-              << "mix $<n> <insert_sec>\n"
-              << "Mixes the main audio with the additional input $n starting at insert_sec.\n"
-              << "mute <start_sec> <end_sec>\n"
-              << "Sets the audio samples between start_sec and end_sec to zero.\n"
-              << "echo <delay_sec> <attenuation>\n"
-              << "Adds an echo effect with given delay and attenuation.\n";
+              << "-c config.txt output.wav input1.wav [input2.wav ...] : run processing\n\n";
 }
 
 bool CmdParser::showHelp() {

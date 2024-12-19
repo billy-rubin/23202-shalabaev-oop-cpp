@@ -1,8 +1,8 @@
-
 #ifndef LAB3_EXCEPTIONSHANDLER_H
 #define LAB3_EXCEPTIONSHANDLER_H
 #include "iostream"
 #include "error.h"
+
 enum class ErrorCode {
     INVALID_ARGUMENTS = 1,
     UNSUPPORTED_FORMAT = 2,

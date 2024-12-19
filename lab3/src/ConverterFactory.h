@@ -4,14 +4,28 @@
 #include <map>
 #include <memory>
 #include <string>
+#include "regex"
 
 class ConverterFactory {
-private:
-    std::map<std::string, Converter*> converterTypes;
 public:
-    ConverterFactory();
-    ~ConverterFactory();
-    Converter* createFromLine(const std::string& line) const;
+    virtual ~ConverterFactory() = default;
+    virtual Converter* create(const std::smatch& line) const = 0;
+};
+
+class MuterFactory : public ConverterFactory{
+public:
+    Converter* create(const std::smatch& line) const override;
+};
+
+class MixerFactory : public ConverterFactory{
+public:
+    Converter* create(const std::smatch& line) const override;
+
+};
+
+class EchoerFactory : public ConverterFactory{
+public:
+    Converter* create(const std::smatch& line) const override;
 };
 
 #endif //LAB3_CONVERTERFACTORY_H

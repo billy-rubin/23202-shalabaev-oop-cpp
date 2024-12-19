@@ -1,5 +1,4 @@
 set(SOURCES
-        AudioStream.cpp
         ConfigParser.cpp
         Converter.cpp
         ConverterFactory.cpp
@@ -10,7 +9,6 @@ set(SOURCES
 )
 
 set(HEADERS
-        AudioStream.h
         ConfigParser.h
         Converter.h
         ConverterFactory.h

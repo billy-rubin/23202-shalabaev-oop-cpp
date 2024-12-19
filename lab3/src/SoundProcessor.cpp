@@ -1,23 +1,12 @@
 #include "SoundProcessor.h"
-#include "ConfigParser.h"
-#include "AudioStream.h"
-#include "ExceptionsHandler.h"
-#include "Converter.h"
-#include "WavHeader.h"
-#include <iostream>
-SoundProcessor::SoundProcessor(const std::string& configFile, const std::string& outputFile, const std::vector<std::string>& inputFiles)
-        : configFile(configFile), outputFile(outputFile), inputFiles(inputFiles), currentStream(nullptr) {
+
+SoundProcessor::SoundProcessor(const std::string& configFile, const std::string& outputFile, const std::vector<std::string>& inputFiles, std::vector<int16_t> audioStream)
+        : configFile(configFile), outputFile(outputFile), inputFiles(inputFiles), currentStream(audioStream) {
 }
 
 SoundProcessor::~SoundProcessor() {
-    for (auto &kv : inputWavs) {
-        delete kv.second;
-    }
-    inputWavs.clear();
-
-    if (currentStream) {
-        delete currentStream;
-        currentStream = nullptr;
+    if (!currentStream.empty()) {
+        currentStream.clear();
     }
 }
 
@@ -28,23 +17,23 @@ void SoundProcessor::load() {
     for (int i = 0; i < inputFiles.size(); ++i) {
         WavFile* w = new WavFile();
         w->load(inputFiles[i]);
-        inputWavs[i+1] = w;
+        inputWaves.push_back(w);
     }
 }
 
 int SoundProcessor::run() {
     try {
         load();
-        ConfigParser parser(configFile, factory);
+
+        ConfigParser parser(configFile);
         std::vector<Converter*> converters = parser.parse();
 
-        currentStream = new MemoryAudioStream(*inputWavs[1]);
+        currentStream = inputWaves[0]->getSamples();
 
-        std::map<int, WavFile*> additionalInputs = inputWavs;
-
+        std::vector<WavFile*> addInputs = inputWaves;
         for (Converter* conv : converters) {
-            AudioStream* newStream = conv->convert(*currentStream, additionalInputs);
-            delete currentStream;
+            std::vector<int16_t> newStream = conv->convert(currentStream, addInputs);
+            currentStream.clear();
             currentStream = newStream;
         }
 
@@ -53,7 +42,7 @@ int SoundProcessor::run() {
         }
 
         WavFile output;
-        const std::vector<int16_t> outSamples = currentStream->getSamples();
+        const std::vector<int16_t> outSamples = currentStream;
         output.getSamples() = outSamples;
         output.save(outputFile);
 

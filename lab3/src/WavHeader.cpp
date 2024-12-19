@@ -22,7 +22,7 @@ void WavFile::load(const std::string& filename) {
     inputFile.read(chunkID, 4); // RIFF
     if(!inputFile)
         throw FileIOException("Cannot read WAV header: " + filename);
-    inputFile.read(reinterpret_cast<char*>(&chunkSize), 4); //
+    inputFile.read(reinterpret_cast<char*>(&chunkSize), 4); //размер оставшейся цепочки
     inputFile.read(format, 4); // WAVE
     inputFile.read(subchunk1ID, 4); // fmt
     inputFile.read(reinterpret_cast<char*>(&subchunk1Size), 4); //PCM format
@@ -70,6 +70,7 @@ void WavFile::load(const std::string& filename) {
     if(!inputFile.read(reinterpret_cast<char*>(samples.data()), dataSize)) {
         throw FileIOException("Cannot read samples from: " + filename);
     }
+
 }
 
 void WavFile::save(const std::string& filename) {
@@ -78,7 +79,6 @@ void WavFile::save(const std::string& filename) {
         throw FileIOException("Cannot open output file: " + filename);
     }
 
-    // Пересчёт параметров исходя из текущих сэмплов
     byteRate = sampleRate * numChannels * (bitsPerSample/8);
     blockAlign = numChannels * (bitsPerSample/8);
     subchunk2Size = (samples.size() * numChannels * (bitsPerSample/8));
@@ -109,8 +109,4 @@ std::vector<int16_t>& WavFile::getSamples() {
 
 const std::vector<int16_t>& WavFile::getSamples() const {
     return samples;
-}
-
-int WavFile::getSampleRate() const {
-    return sampleRate;
 }
